@@ -78,45 +78,63 @@ wire clk, rst;
 assign clk = aclk;
 assign rst = ~aresetn;
 
-wire        inst_req  ;
-wire [31:0] inst_addr ;
-wire        inst_wr   ;
-wire [1:0]  inst_size ;
-wire [31:0] inst_wdata;
-wire [31:0] inst_rdata;
-wire        inst_addr_ok;
-wire        inst_data_ok;
+wire        cpu_inst_req  ;
+wire [31:0] cpu_inst_addr ;
+wire        cpu_inst_wr   ;
+wire [1:0]  cpu_inst_size ;
+wire [31:0] cpu_inst_wdata;
+wire [31:0] cpu_inst_rdata;
+wire        cpu_inst_addr_ok;
+wire        cpu_inst_data_ok;
 
-wire        data_req  ;
-wire [31:0] data_addr ;
-wire        data_wr   ;
-wire [1:0]  data_size ;
-wire [31:0] data_wdata;
-wire [31:0] data_rdata;
-wire        data_addr_ok;
-wire        data_data_ok;
+wire        cpu_data_req  ;
+wire [31:0] cpu_data_addr ;
+wire        cpu_data_wr   ;
+wire [1:0]  cpu_data_size ;
+wire [31:0] cpu_data_wdata;
+wire [31:0] cpu_data_rdata;
+wire        cpu_data_addr_ok;
+wire        cpu_data_data_ok;
+
+wire        cache_inst_req  ;
+wire [31:0] cache_inst_addr ;
+wire        cache_inst_wr   ;
+wire [1:0]  cache_inst_size ;
+wire [31:0] cache_inst_wdata;
+wire [31:0] cache_inst_rdata;
+wire        cache_inst_addr_ok;
+wire        cache_inst_data_ok;
+
+wire        cache_data_req  ;
+wire [31:0] cache_data_addr ;
+wire        cache_data_wr   ;
+wire [1:0]  cache_data_size ;
+wire [31:0] cache_data_wdata;
+wire [31:0] cache_data_rdata;
+wire        cache_data_addr_ok;
+wire        cache_data_data_ok;
 
 mips_core mips_core(
     .clk(clk), .rst(rst),
     .ext_int(ext_int),
 
-    .inst_req     (inst_req  ),
-    .inst_wr      (inst_wr   ),
-    .inst_addr    (inst_addr ),
-    .inst_size    (inst_size ),
-    .inst_wdata   (inst_wdata),
-    .inst_rdata   (inst_rdata),
-    .inst_addr_ok (inst_addr_ok),
-    .inst_data_ok (inst_data_ok),
+    .inst_req     (cpu_inst_req  ),
+    .inst_wr      (cpu_inst_wr   ),
+    .inst_addr    (cpu_inst_addr ),
+    .inst_size    (cpu_inst_size ),
+    .inst_wdata   (cpu_inst_wdata),
+    .inst_rdata   (cpu_inst_rdata),
+    .inst_addr_ok (cpu_inst_addr_ok),
+    .inst_data_ok (cpu_inst_data_ok),
 
-    .data_req     (data_req  ),
-    .data_wr      (data_wr   ),
-    .data_addr    (data_addr ),
-    .data_wdata   (data_wdata),
-    .data_size    (data_size ),
-    .data_rdata   (data_rdata),
-    .data_addr_ok (data_addr_ok),
-    .data_data_ok (data_data_ok),
+    .data_req     (cpu_data_req  ),
+    .data_wr      (cpu_data_wr   ),
+    .data_addr    (cpu_data_addr ),
+    .data_wdata   (cpu_data_wdata),
+    .data_size    (cpu_data_size ),
+    .data_rdata   (cpu_data_rdata),
+    .data_addr_ok (cpu_data_addr_ok),
+    .data_data_ok (cpu_data_data_ok),
 
     .debug_wb_pc       (debug_wb_pc       ),  
     .debug_wb_rf_wen   (debug_wb_rf_wen   ),  
@@ -125,30 +143,67 @@ mips_core mips_core(
 );
 
 //cache
+cache cache(
+    .clk(clk), .rst(rst),
+    .cpu_inst_req     (cpu_inst_req  ),
+    .cpu_inst_wr      (cpu_inst_wr   ),
+    .cpu_inst_addr    (cpu_inst_addr ),
+    .cpu_inst_size    (cpu_inst_size ),
+    .cpu_inst_wdata   (cpu_inst_wdata),
+    .cpu_inst_rdata   (cpu_inst_rdata),
+    .cpu_inst_addr_ok (cpu_inst_addr_ok),
+    .cpu_inst_data_ok (cpu_inst_data_ok),
 
-//
+    .cpu_data_req     (cpu_data_req  ),
+    .cpu_data_wr      (cpu_data_wr   ),
+    .cpu_data_addr    (cpu_data_addr ),
+    .cpu_data_wdata   (cpu_data_wdata),
+    .cpu_data_size    (cpu_data_size ),
+    .cpu_data_rdata   (cpu_data_rdata),
+    .cpu_data_addr_ok (cpu_data_addr_ok),
+    .cpu_data_data_ok (cpu_data_data_ok),
+
+
+    .cache_inst_req     (cache_inst_req  ),
+    .cache_inst_wr      (cache_inst_wr   ),
+    .cache_inst_addr    (cache_inst_addr ),
+    .cache_inst_size    (cache_inst_size ),
+    .cache_inst_wdata   (cache_inst_wdata),
+    .cache_inst_rdata   (cache_inst_rdata),
+    .cache_inst_addr_ok (cache_inst_addr_ok),
+    .cache_inst_data_ok (cache_inst_data_ok),
+
+    .cache_data_req     (cache_data_req  ),
+    .cache_data_wr      (cache_data_wr   ),
+    .cache_data_addr    (cache_data_addr ),
+    .cache_data_wdata   (cache_data_wdata),
+    .cache_data_size    (cache_data_size ),
+    .cache_data_rdata   (cache_data_rdata),
+    .cache_data_addr_ok (cache_data_addr_ok),
+    .cache_data_data_ok (cache_data_data_ok)
+);
 
 cpu_axi_interface cpu_axi_interface(
     .clk(clk),
     .resetn(~rst),
 
-    .inst_req       (inst_req  ),
-    .inst_wr        (inst_wr   ),
-    .inst_size      (inst_size ),
-    .inst_addr      (inst_addr ),
-    .inst_wdata     (inst_wdata),
-    .inst_rdata     (inst_rdata),
-    .inst_addr_ok   (inst_addr_ok),
-    .inst_data_ok   (inst_data_ok),
+    .inst_req       (cache_inst_req  ),
+    .inst_wr        (cache_inst_wr   ),
+    .inst_size      (cache_inst_size ),
+    .inst_addr      (cache_inst_addr ),
+    .inst_wdata     (cache_inst_wdata),
+    .inst_rdata     (cache_inst_rdata),
+    .inst_addr_ok   (cache_inst_addr_ok),
+    .inst_data_ok   (cache_inst_data_ok),
 
-    .data_req       (data_req  ),
-    .data_wr        (data_wr   ),
-    .data_size      (data_size ),
-    .data_addr      (data_addr ),
-    .data_wdata     (data_wdata ),
-    .data_rdata     (data_rdata),
-    .data_addr_ok   (data_addr_ok),
-    .data_data_ok   (data_data_ok),
+    .data_req       (cache_data_req  ),
+    .data_wr        (cache_data_wr   ),
+    .data_size      (cache_data_size ),
+    .data_addr      (cache_data_addr ),
+    .data_wdata     (cache_data_wdata ),
+    .data_rdata     (cache_data_rdata),
+    .data_addr_ok   (cache_data_addr_ok),
+    .data_data_ok   (cache_data_data_ok),
 
     .arid(arid),
     .araddr(araddr),
