@@ -26,7 +26,7 @@ module d_sram_to_sram_like(
 
     always @(posedge clk) begin
         addr_rcv <= rst          ? 1'b0 :
-                    data_req & data_addr_ok ? 1'b1 :    //保证先data_req再addr_rcv
+                    data_req & data_addr_ok & ~data_data_ok ? 1'b1 :    //保证先data_req再addr_rcv；如果addr_ok同时data_ok，则优先data_ok
                     data_data_ok ? 1'b0 : addr_rcv;
     end
 
