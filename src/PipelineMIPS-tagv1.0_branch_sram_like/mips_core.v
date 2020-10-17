@@ -56,10 +56,6 @@ module mips_core (
 
     wire longest_stall;
 
-    //mmu
-    wire [31:0] inst_sram_paddr;
-    wire [31:0] data_sram_paddr;
-
     datapath datapath(
         .clk(clk), .rst(rst),
         .ext_int(ext_int),
@@ -86,19 +82,12 @@ module mips_core (
         .debug_wb_rf_wdata (debug_wb_rf_wdata )  
     );
 
-    mmu mmu(
-        .inst_vaddr(inst_sram_addr),
-        .inst_paddr(inst_sram_paddr),
-        .data_vaddr(data_sram_addr),
-        .data_paddr(data_sram_paddr)
-    );
-
     //inst sram to sram-like
     i_sram_to_sram_like i_sram_to_sram_like(
         .clk(clk), .rst(rst),
         //sram
         .inst_sram_en(inst_sram_en),
-        .inst_sram_addr(inst_sram_paddr),
+        .inst_sram_addr(inst_sram_addr),
         .inst_sram_rdata(inst_sram_rdata),
         .i_stall(i_stall),
         //sram like
@@ -119,7 +108,7 @@ module mips_core (
         .clk(clk), .rst(rst),
         //sram
         .data_sram_en(data_sram_en),
-        .data_sram_addr(data_sram_paddr),
+        .data_sram_addr(data_sram_addr),
         .data_sram_rdata(data_sram_rdata),
         .data_sram_wen(data_sram_wen),
         .data_sram_wdata(data_sram_wdata),
