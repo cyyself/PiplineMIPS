@@ -105,7 +105,7 @@ wire [31:0] data_sram_wdata
 
     always @(posedge clk) begin
         addr_rcv <= rst          ? 1'b0 :
-                    data_req & data_addr_ok ? 1'b1 :    //保证先data_req再addr_rcv
+                    ~data_data_ok & data_req & data_addr_ok ? 1'b1 :    //data_data_ok优先
                     data_data_ok ? 1'b0 : addr_rcv;
     end
 
