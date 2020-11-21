@@ -47,6 +47,7 @@ module cp0_reg(
    
    reg        timer_int_o;
 
+   wire [31:0] count_o;
    assign count_o = count_inner[32:1];    //右移1位，相当于每两个时钟加1
 
    always @(posedge clk) begin

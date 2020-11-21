@@ -1,23 +1,20 @@
 // 结构
-//           ---------------------------------------    mycpu_top.v
-//        |   -------------------------    mips core|
-//        |   |        data_path       |            |
-//        |   -------------------------             |
-//        |        | sram       | sram              |
-//        |      ----           ----                |
-//        |     |    |         |    |               |
-//        |      ----           ----                |
-//        |        | sram-like    | sram-like       |
+//              -------------------------------- mycpu_top.v
+//              |                              |
+//              |          mips core           |
+//              |                              |
+//              |  sram-like          sram-like|
+//              --------------------------------
+//                  |                     | 
+//           ----------------        ------------         1x2 bridge
+//           |  i cache	    |		  |	       |  
+//           |  	     	|		  |	   |d cache|  
+//           ----------------         |        |
+//                 |                 ------------         2x1 bridge
+//                 | sram-like            | sram-like
 //           ---------------------------------------
-//                 | sram-like    | sram-like
-//           ---------------------------------------
-//        |    								cache    |
-//        |    								         |
-//           ---------------------------------------
-//                 | sram-like    | sram-like
-//           ---------------------------------------
-//        |    			cpu_axi_interface(longsoon)  |
-//        |    								         |
+//           |    	cpu_axi_interface(longsoon)    |
+//           |    								   |
 //           ---------------------------------------
 //          			        | axi
 
@@ -215,43 +212,46 @@ bridge_1x2 bridge_1x2(
 );
 
 //cache
-cache cache(
+i_cache i_cache(
     .clk(clk), .rst(rst),
-    .cpu_inst_req     (cpu_inst_req  ),
-    .cpu_inst_wr      (cpu_inst_wr   ),
-    .cpu_inst_addr    (cpu_inst_paddr ),    //paddr
-    .cpu_inst_size    (cpu_inst_size ),
-    .cpu_inst_wdata   (cpu_inst_wdata),
-    .cpu_inst_rdata   (cpu_inst_rdata),
-    .cpu_inst_addr_ok (cpu_inst_addr_ok),
-    .cpu_inst_data_ok (cpu_inst_data_ok),
+    .cpu_inst_req     (cpu_inst_req     ),
+    .cpu_inst_wr      (cpu_inst_wr      ),
+    .cpu_inst_size    (cpu_inst_size    ),
+    .cpu_inst_addr    (cpu_inst_paddr    ),
+    .cpu_inst_wdata   (cpu_inst_wdata   ),
+    .cpu_inst_rdata   (cpu_inst_rdata   ),
+    .cpu_inst_addr_ok (cpu_inst_addr_ok ),
+    .cpu_inst_data_ok (cpu_inst_data_ok ),
 
-    .cpu_data_req     (ram_data_req  ),
-    .cpu_data_wr      (ram_data_wr   ),
-    .cpu_data_addr    (ram_data_addr ),
-    .cpu_data_wdata   (ram_data_wdata),
-    .cpu_data_size    (ram_data_size ),
-    .cpu_data_rdata   (ram_data_rdata),
-    .cpu_data_addr_ok (ram_data_addr_ok),
-    .cpu_data_data_ok (ram_data_data_ok),
+    .cache_inst_req     (cache_inst_req     ),
+    .cache_inst_wr      (cache_inst_wr      ),
+    .cache_inst_size    (cache_inst_size    ),
+    .cache_inst_addr    (cache_inst_addr    ),
+    .cache_inst_wdata   (cache_inst_wdata   ),
+    .cache_inst_rdata   (cache_inst_rdata   ),
+    .cache_inst_addr_ok (cache_inst_addr_ok ),
+    .cache_inst_data_ok (cache_inst_data_ok )
+);
 
-    .cache_inst_req     (cache_inst_req  ),
-    .cache_inst_wr      (cache_inst_wr   ),
-    .cache_inst_addr    (cache_inst_addr ),
-    .cache_inst_size    (cache_inst_size ),
-    .cache_inst_wdata   (cache_inst_wdata),
-    .cache_inst_rdata   (cache_inst_rdata),
-    .cache_inst_addr_ok (cache_inst_addr_ok),
-    .cache_inst_data_ok (cache_inst_data_ok),
+d_cache d_cache(
+    .clk(clk), .rst(rst),
+    .cpu_data_req     (ram_data_req     ),
+    .cpu_data_wr      (ram_data_wr      ),
+    .cpu_data_size    (ram_data_size    ),
+    .cpu_data_addr    (ram_data_addr    ),
+    .cpu_data_wdata   (ram_data_wdata   ),
+    .cpu_data_rdata   (ram_data_rdata   ),
+    .cpu_data_addr_ok (ram_data_addr_ok ),
+    .cpu_data_data_ok (ram_data_data_ok ),
 
-    .cache_data_req     (cache_data_req  ),
-    .cache_data_wr      (cache_data_wr   ),
-    .cache_data_addr    (cache_data_addr ),
-    .cache_data_wdata   (cache_data_wdata),
-    .cache_data_size    (cache_data_size ),
-    .cache_data_rdata   (cache_data_rdata),
-    .cache_data_addr_ok (cache_data_addr_ok),
-    .cache_data_data_ok (cache_data_data_ok)
+    .cache_data_req     (cache_data_req     ),
+    .cache_data_wr      (cache_data_wr      ),
+    .cache_data_size    (cache_data_size    ),
+    .cache_data_addr    (cache_data_addr    ),
+    .cache_data_wdata   (cache_data_wdata   ),
+    .cache_data_rdata   (cache_data_rdata   ),
+    .cache_data_addr_ok (cache_data_addr_ok ),
+    .cache_data_data_ok (cache_data_data_ok )
 );
 
 //根据是否经过Cache，将信号合为一路
