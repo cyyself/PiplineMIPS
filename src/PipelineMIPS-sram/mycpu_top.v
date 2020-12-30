@@ -35,9 +35,6 @@ module mycpu_top (
     wire [31:0] data_wdata ;
     wire d_cache_stall     ;
 
-    assign inst_sram_wen = 4'b0;
-    assign inst_sram_wdata = 32'b0;
-
     wire [31:0] inst_paddr ;
     wire [31:0] data_paddr ;
 
@@ -71,33 +68,16 @@ module mycpu_top (
         .data_paddr(data_paddr)
     );
 
-    i_cache i_cache(
-        .clk(clk), .rst(~resetn),
+    assign inst_sram_en = inst_en;
+    assign inst_sram_wen = 4'b0;
+    assign inst_sram_addr = inst_paddr;
+    assign inst_sram_wdata = 32'b0;
+    assign inst_rdata = inst_sram_rdata;
 
-        .inst_en(inst_en),
-        .inst_addr(inst_paddr),
-        .inst_rdata(inst_rdata),
-
-        .inst_sram_en(inst_sram_en),
-        .inst_sram_addr(inst_sram_addr),
-        .inst_sram_rdata(inst_sram_rdata)
-    );
-
-    wire [31:0] data_sram_vaddr;
-    d_cache d_cache(
-        .clk(clk), .rst(~resetn),
-        //datapath
-        .data_en(data_en),
-        .data_addr(data_paddr),
-        .data_rdata(data_rdata),
-        .data_wen(data_wen),
-        .data_wdata(data_wdata),
-        //outer
-        .data_sram_en(data_sram_en),
-        .data_sram_wen(data_sram_wen),
-        .data_sram_addr(data_sram_addr),
-        .data_sram_wdata(data_sram_wdata),
-        .data_sram_rdata(data_sram_rdata)
-    );
+    assign data_sram_en = data_en;
+    assign data_sram_wen = data_wen;
+    assign data_sram_addr = data_paddr;
+    assign data_sram_wdata = data_wdata;
+    assign data_rdata = data_sram_rdata;
 
 endmodule
