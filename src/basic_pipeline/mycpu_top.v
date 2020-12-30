@@ -40,7 +40,6 @@ module mycpu_top (
 
     datapath datapath(
         .clk(clk), .rst(~resetn),
-        .ext_int(ext_int),
 
         //inst
         .inst_addrF(inst_addr),

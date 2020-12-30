@@ -1,6 +1,5 @@
 module datapath (
     input wire clk, rst,
-    input wire [5:0] ext_int,
     
     //inst
     output wire [31:0] inst_addrF,
@@ -21,9 +20,6 @@ module datapath (
     wire [31:0] pcF, pc_next, pc_plus4F;
     wire pc_reg_ceF;
     wire [1:0] pc_sel;
-    wire [31:0] instrF_temp;
-    wire is_in_delayslot_iF;
-    // wire pcerrorD, pcerrorE, pcerrorM; 
 //ID
     wire [31:0] instrD;
     wire [31:0] pcD, pc_plus4D;
@@ -39,7 +35,6 @@ module datapath (
     wire [31:0] pc_jumpD;
     wire jumpD;
     wire jump_conflictD;
-    wire is_in_delayslot_iD;
 //EX
     wire [31:0] pcE;
     wire [31:0] rd1E, rd2E, mem_wdataE;
@@ -51,8 +46,7 @@ module datapath (
     wire [1:0] reg_dstE;
     wire [4:0] alu_controlE;
 
-    wire [31:0] src_aE, src_bE;
-    wire [63:0] alu_outE;
+    wire [31:0] src_aE, src_bE, alu_outE;
     wire alu_imm_selE;
     wire [4:0] reg_writeE;
     wire [31:0] instrE;
@@ -61,10 +55,6 @@ module datapath (
     wire [31:0] pc_jumpE;
     wire jump_conflictE;
     wire reg_write_enE;
-    wire div_stall;
-
-    wire is_in_delayslot_iE;
-    wire overflowE;
 //MEM
     wire [31:0] pcM;
     wire [31:0] alu_outM;
@@ -80,44 +70,12 @@ module datapath (
     wire pred_takeM;
     wire branchM;
     wire [31:0] pc_branchM;
-
-    wire [3:0] mem_byte_wenM;
-    wire [31:0] mem_ctrl_rdataM;
-    wire [31:0] mem_wdataM_temp;
-    wire [31:0] data_rdataM;
-
-    wire hilo_wenE;
-    wire [63:0] hilo_o;
-    wire hilo_to_regM;
-    wire riM;
-    wire breakM;
-    wire syscallM;
-    wire eretM;
-    wire overflowM;
-    wire addrErrorLwM, addrErrorSwM;
-    wire pcErrorM;
-
-    wire [31:0] except_typeM;
-    wire [31:0] cp0_statusM;
-    wire [31:0] cp0_causeM;
-    wire [31:0] cp0_epcM;
-
-    wire flush_exceptionM;
-    wire [31:0] pc_exceptM;
-    wire pc_trapM;
-    wire [31:0] badvaddrM;
-    wire is_in_delayslot_iM;
-    wire [4:0] rdM;
-    wire cp0_to_regM;
-    wire mem_ctrl_enM;
 //WB
     wire [31:0] pcW;
     wire reg_write_enW;
     wire [31:0] alu_outW;
     wire [4:0] reg_writeW;
     wire [31:0] resultW;
-
-    wire [31:0] cp0_statusW, cp0_causeW, cp0_epcW, data_oW;
 
 //-------------------------------------------------------------------
 //模块实例化
@@ -132,20 +90,11 @@ module datapath (
         .reg_dstE(reg_dstE),
         .alu_imm_selE(alu_imm_selE),
         .reg_write_enE(reg_write_enE),
-        .hilo_wenE(hilo_wenE),
         //MEM
         .mem_read_enM(mem_read_enM),
         .mem_write_enM(mem_write_enM),
         .reg_write_enM(reg_write_enM),
-        .mem_to_regM(mem_to_regM),
-        .hilo_to_regM(hilo_to_regM),
-        .riM(riM),
-        .breakM(breakM),
-        .syscallM(syscallM),
-        .eretM(eretM),
-        .cp0_wenM(cp0_wenM),
-        .cp0_to_regM(cp0_to_regM)
-
+        .mem_to_regM(mem_to_regM)
         //WB
     );
     alu_decoder alu_decoder0(
@@ -162,7 +111,6 @@ module datapath (
         .instrE(instrE),
         .instrM(instrM),
         .d_cache_stall(d_cache_stall),
-        .div_stall(div_stall),
         .rsE(rsE),
         .rtE(rtE),
         .reg_write_enM(reg_write_enM),
@@ -182,7 +130,7 @@ module datapath (
     mux4 #(32) mux4_pc(pc_plus4F, pc_branchD, pc_branchM, pc_plus4E, pc_sel, pc_next_temp); //pc_plus4D等价于branch指令的PC+8
     // pc_jumpD <- jumpD & ~jump_conflictD
     // pc_jumpE <- jump_conflictE
-    assign pc_next = pc_trapM ? pc_exceptM :jumpD & ~jump_conflictD ? pc_jumpD : 
+    assign pc_next = jumpD & ~jump_conflictD ? pc_jumpD : 
                         jump_conflictE ? pc_jumpE : pc_next_temp;
 
     pc_reg pc_reg0(
@@ -206,23 +154,18 @@ module datapath (
 
         .pc_sel(pc_sel)
     );
-
-    assign instrF_temp = ({32{~(|(pcF[1:0] ^ 2'b00))}} & instrF);
-    assign is_in_delayslot_iF = branchD | jumpD;
 //IF_ID
     if_id if_id0(
         .clk(clk), .rst(rst),
-        .flushD(pred_failed_flushDE | flush_exceptionM),
+        .flushD(pred_failed_flushDE),
         .stallD(stallD),
         .pcF(pcF),
         .pc_plus4F(pc_plus4F),
-        .instrF(instrF_temp),
-        .is_in_delayslot_iF(is_in_delayslot_iF),
+        .instrF(instrF),
         
         .pcD(pcD),
         .pc_plus4D(pc_plus4D),
-        .instrD(instrD),
-        .is_in_delayslot_iD(is_in_delayslot_iD)
+        .instrD(instrD)
     );
 
     //use for debug
@@ -247,7 +190,7 @@ module datapath (
 
     regfile regfile0(
         .clk(clk),
-        .we3(reg_write_enM & ~d_cache_stall & ~flush_exceptionM),
+        .we3(reg_write_enM & ~d_cache_stall),
         .ra1(rsD), .ra2(rtD), .wa3(reg_writeM), 
         .wd3(resultM),
 
@@ -281,7 +224,7 @@ module datapath (
         .clk(clk),
         .rst(rst),
         .stallE(stallE),
-        .flushE(pred_failed_flushDE  | flush_exceptionM),
+        .flushE(pred_failed_flushDE),
         .pcD(pcD),
         .rsD(rsD), .rd1D(rd1D), .rd2D(rd2D),
         .rtD(rtD), .rdD(rdD),
@@ -292,7 +235,6 @@ module datapath (
         .pred_takeD(pred_takeD),
         .pc_branchD(pc_branchD),
         .jump_conflictD(jump_conflictD),
-        .is_in_delayslot_iD(is_in_delayslot_iD),
         
         .pcE(pcE),
         .rsE(rsE), .rd1E(rd1E), .rd2E(rd2E),
@@ -303,18 +245,14 @@ module datapath (
         .branchE(branchE),
         .pred_takeE(pred_takeE),
         .pc_branchE(pc_branchE),
-        .jump_conflictE(jump_conflictE),
-        .is_in_delayslot_iE(is_in_delayslot_iE)
+        .jump_conflictE(jump_conflictE)
     );
 //EX
     alu alu0(
         .src_aE(src_aE), .src_bE(src_bE),
         .alu_controlE(alu_controlE),
-        .sa(sa),
 
-        .div_stall(div_stall),
-        .alu_outE(alu_outE),
-        .overflowE(overflowE)
+        .alu_outE(alu_outE)
     );
 
     //mux write reg
@@ -335,7 +273,6 @@ module datapath (
         .clk(clk),
         .rst(rst),
         .stallM(stallM),
-        .flushM(flush_exceptionM),
         .pcE(pcE),
         .alu_outE(alu_outE),
         .mem_wdataE(mem_wdataE),
@@ -344,98 +281,26 @@ module datapath (
         .branchE(branchE),
         .pred_takeE(pred_takeE),
         .pc_branchE(pc_branchE),
-        .overflowE(overflowE),
-        .is_in_delayslot_iE(is_in_delayslot_iE),
-        .rdE(rdE),
 
         .pcM(pcM),
         .alu_outM(alu_outM),
-        .mem_wdataM(mem_wdataM_temp),
+        .mem_wdataM(mem_wdataM),
         .reg_writeM(reg_writeM),
         .instrM(instrM),
         .branchM(branchM),
         .pred_takeM(pred_takeM),
-        .pc_branchM(pc_branchM),
-        .is_in_delayslot_iM(is_in_delayslot_iM),
-        .rdM(rdM)
+        .pc_branchM(pc_branchM)
     );
 //MEM
     assign mem_addrM = alu_outM;
 
-    assign mem_enM = (mem_read_enM | mem_write_enM) & ~mem_error_enM; //读或者写
-    // assign mem_wenM = {4{mem_write_enM}};           //暂时只有sw
-    assign mem_wenM = mem_byte_wenM;
+    assign mem_enM = mem_read_enM | mem_write_enM; //读或者写
+    assign mem_wenM = {4{mem_write_enM}};           //暂时只有sw
 
-    // 是否需要控制 mem_en
-    mem_ctrr mem_ctrl0(
-        .instrM(instrM),
-        .addr(alu_outM),
-    
-        .data_wdataM(mem_wdataM_temp),
-        .mem_wdataM(mem_wdataM),
-        .mem_byte_wenM(mem_byte_wenM),
-
-        .mem_rdataM(mem_rdataM),
-        .data_rdataM(data_rdataM),
-
-        .addr_error_sw(addrErrorSwM),
-        .addr_error_lw(addrErrorLwM),
-        .mem_error_enM(mem_error_enM)
-    );
-
-    hilo_reg hilo0(
-        .clk(clk),
-        .rst(rst),
-        .we(hilo_wenE), //both write lo and hi
-
-        .hilo_i(alu_outE),
-        .hilo_o(hilo_o)
-    );
-
-    assign pcErrorM = |(pcM[1:0] ^ 2'b00); 
-    
-    exception exception0(
-        .rst(rst),
-        .ext_int(ext_int),
-        .ri(riM), break(breakM), syscall(syscallM), overflow(overflowM), addrErrorSw(addrErrorSwM), addrErrorLw(addrErrorLwM), pcError(pcErrorM), eretM(eretM),
-        .cp0_status(cp0_statusW), cp0_cause(cp0_causeW), cp0_epc(cp0_epcW),
-        .pcM(pcM),
-        .alu_outM(alu_outM),
-
-        .except_type(except_typeM),
-        .flush_exception(flush_exceptionM),
-        .pc_except(pc_exceptM),
-        .pc_trap(pc_trapM),
-        .badvaddrM(badvaddrM)
-    );
-
-    cp0_reg cp0(
-        .clk(clk),
-        .rst(rst),
-        
-        .we_i(cp0_wenM),
-        .en(flush_exceptionM),
-        .waddr_i(rdM),
-        .raddr_i(rdM),
-        .data_i(mem_wdataM_temp),
-
-        .except_type_i(except_typeM),
-        .current_inst_addr_i(pcM),
-        .is_in_delayslot_i(is_in_delayslot_iM),
-        .badvaddr_i(badvaddrM),
-
-        .data_o(data_oW),
-        .status_o(cp0_statusW),
-        .cause_o(cp0_causeW),
-        .epc_o(cp0_epcW)
-    );
-
-    // mux4 #(32) mux2_mem_to_reg(alu_outM, data_rdataM, hilo_o,  32'd0, {hilo_to_regM, mem_to_regM}, resultM);
-    mux4 #(32) mux2_mem_to_reg(alu_outM, data_rdataM, hilo_o, data_oW, {(hilo_to_regM | cp0_to_regM), (mem_to_regM | cp0_to_regM)}, resultM);
+    mux2 #(32) mux2_mem_to_reg(alu_outM, mem_rdataM, mem_to_regM, resultM);
 
     //branch predict result
-    assign actual_takeM = branchM & ~(|alu_outM);
-    // llgg 这里有问题；
+    assign actual_takeM = branchM & alu_outM[0];
     assign succM = ~(pred_takeM ^ actual_takeM);
     assign pred_failed_flushDE = ~succM;
 //MEM_WB
