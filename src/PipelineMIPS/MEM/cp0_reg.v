@@ -129,18 +129,6 @@ module cp0_reg(
       end
    end
 
-   //timer int
-   wire compare_wen;
-   assign compare_wen = wen & (addr == `CP0_COMPARE);
-   always @(posedge clk) begin
-      if(rst | compare_wen) begin
-         timer_int <= 1'b0;
-      end
-      else begin
-         //计时器中断
-         timer_int <= (compare_reg != 32'b0) && (count_reg == compare_reg) ? 1'b1 : 1'b0;
-      end
-   end
 
 //与异常有关
    //status
@@ -166,21 +154,30 @@ module cp0_reg(
    //cause
    wire cause_wen;
    assign cause_wen = wen & (addr == `CP0_CAUSE);
+      //timer int
+   wire compare_wen;
+   assign compare_wen = wen & (addr == `CP0_COMPARE);
 
    always @(posedge clk) begin
       if(rst) begin
          cause_reg     <= `CAUSE_INIT;
       end
-      else if(flush_exception) begin
-         cause_reg[`BD_BIT] <= is_in_delayslot;
-         cause_reg[`EXC_CODE_BITS] <= except_type;
-      end
-      else if(cause_wen) begin
-         cause_reg[`IP1_IP0_BITS] <= wdata[`IP1_IP0_BITS];  //软件中断
-      end
       else begin
+         if(flush_exception) begin
+            cause_reg[`BD_BIT] <= is_in_delayslot;
+            cause_reg[`EXC_CODE_BITS] <= except_type;
+         end
+         if(cause_wen) begin
+            cause_reg[`IP1_IP0_BITS] <= wdata[`IP1_IP0_BITS];  //软件中断
+         end
+         if(compare_wen) begin
+            cause_reg[`IP7_BIT] <= 1'b0;
+         end
+         else if((compare_reg != 32'b0) && (count_reg == compare_reg)) begin
+            cause_reg[`IP7_BIT] <=  1'b1;
+         end
          //外部中断
-         cause_reg[`IP7_IP2_BITS] <= ~stallW ? ext_int : 0;
+         cause_reg[`IP6_IP2_BITS] <= ~stallW ? ext_int[4:0] : 0;
       end
    end
 
