@@ -76,10 +76,10 @@ module main_decoder(
 	assign syscallD = ~(|(op_code ^ `EXE_R_TYPE)) & ~(|(funct ^ `EXE_SYSCALL));
 	assign eretD = ~|(op_code^`EXE_COP0) & ~|(funct^`EXE_ERET);
 
-	assign TLBWI 	= !(op_code ^ `EXE_COP0) & !(funct ^ `EXE_TLBWI	);
-	assign TLBP 	= !(op_code ^ `EXE_COP0) & !(funct ^ `EXE_TLBP	);
-	assign TLBR 	= !(op_code ^ `EXE_COP0) & !(funct ^ `EXE_TLBR	);
-	assign TLBWR 	= !(op_code ^ `EXE_COP0) & !(funct ^ `EXE_TLBWR	);
+	assign TLBWI 	= !(op_code ^ `EXE_COP0) & instrD[25] & !(funct ^ `EXE_TLBWI	);
+	assign TLBP 	= !(op_code ^ `EXE_COP0) & instrD[25] & !(funct ^ `EXE_TLBP	);
+	assign TLBR 	= !(op_code ^ `EXE_COP0) & instrD[25] & !(funct ^ `EXE_TLBR	);
+	assign TLBWR 	= !(op_code ^ `EXE_COP0) & instrD[25] & !(funct ^ `EXE_TLBWR	);
 	assign tlb_typeD = {TLBWR, TLBWI, TLBR, TLBP};
 
 	// special2

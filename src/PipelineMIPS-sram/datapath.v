@@ -13,7 +13,6 @@ module datapath (
     input wire [31:0] mem_rdataM,   //读数据
     output wire [3:0] mem_wenM,     //写使能
     output wire [31:0] mem_wdataM,  //写数据
-    input wire d_cache_stall,
 
     //debug
     output wire [31:0]  debug_wb_pc,      
@@ -136,7 +135,7 @@ module datapath (
 
 //--------------------debug---------------------
     assign debug_wb_pc          = datapath.pcM;
-    assign debug_wb_rf_wen      = {4{reg_write_enM & ~d_cache_stall & flush_exceptionM }};
+    assign debug_wb_rf_wen      = {4{reg_write_enM & ~flush_exceptionM }};
     assign debug_wb_rf_wnum     = datapath.reg_writeM;
     assign debug_wb_rf_wdata    = datapath.resultM;
 
@@ -183,7 +182,6 @@ module datapath (
     hazard hazard0(
         .instrE(instrE), .instrM(instrM),
 
-        .d_cache_stall(d_cache_stall),
         .div_stallE(div_stallE),
 
         .flush_jump_confilctE   (flush_jump_confilctE),

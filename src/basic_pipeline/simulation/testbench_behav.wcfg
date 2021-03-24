@@ -11,38 +11,34 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="349734fs"></ZoomStartTime>
-      <ZoomEndTime time="522535fs"></ZoomEndTime>
-      <Cursor1Time time="627334fs"></Cursor1Time>
+      <ZoomStartTime time="440069fs"></ZoomStartTime>
+      <ZoomEndTime time="627270fs"></ZoomEndTime>
+      <Cursor1Time time="608269fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="250"></NameColumnWidth>
-      <ValueColumnWidth column_width="110"></ValueColumnWidth>
+      <ValueColumnWidth column_width="115"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="7" />
+   <WVObjectSize size="9" />
    <wave_markers>
-      <marker time="280000" label="" />
-      <marker time="380000" label="" />
+      <marker time="330200" label="" />
+      <marker time="473469" label="" />
    </wave_markers>
    <wvobject fp_name="/testbench/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject fp_name="group198" type="group">
-      <obj_property name="label">MEM</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/testbench/memwrite" type="logic">
-         <obj_property name="ElementShortName">memwrite</obj_property>
-         <obj_property name="ObjectShortName">memwrite</obj_property>
-      </wvobject>
-      <wvobject fp_name="/testbench/dataadr" type="array">
-         <obj_property name="ElementShortName">dataadr[31:0]</obj_property>
-         <obj_property name="ObjectShortName">dataadr[31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/testbench/writedata" type="array">
-         <obj_property name="ElementShortName">writedata[31:0]</obj_property>
-         <obj_property name="ObjectShortName">writedata[31:0]</obj_property>
-      </wvobject>
+   <wvobject fp_name="/testbench/writedata" type="array">
+      <obj_property name="ElementShortName">writedata[31:0]</obj_property>
+      <obj_property name="ObjectShortName">writedata[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dataadr" type="array">
+      <obj_property name="ElementShortName">dataadr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataadr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/memwrite" type="logic">
+      <obj_property name="ElementShortName">memwrite</obj_property>
+      <obj_property name="ObjectShortName">memwrite</obj_property>
    </wvobject>
    <wvobject fp_name="/testbench/soc/cpu/debug_wb_pc" type="array">
       <obj_property name="ElementShortName">debug_wb_pc[31:0]</obj_property>
@@ -145,6 +141,7 @@
          <wvobject fp_name="group222" type="group">
             <obj_property name="label">INST</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/testbench/soc/cpu/inst_en" type="logic">
                <obj_property name="ElementShortName">inst_en</obj_property>
                <obj_property name="ObjectShortName">inst_en</obj_property>
@@ -166,7 +163,6 @@
          <wvobject fp_name="group83" type="group">
             <obj_property name="label">REG_FILE</obj_property>
             <obj_property name="DisplayName">label</obj_property>
-            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/testbench/soc/cpu/datapath/regfile0/clk" type="logic">
                <obj_property name="ElementShortName">clk</obj_property>
                <obj_property name="ObjectShortName">clk</obj_property>
@@ -190,8 +186,6 @@
             <wvobject fp_name="/testbench/soc/cpu/datapath/regfile0/wd3" type="array">
                <obj_property name="ElementShortName">wd3[31:0]</obj_property>
                <obj_property name="ObjectShortName">wd3[31:0]</obj_property>
-               <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-               <obj_property name="UseCustomSignalColor">true</obj_property>
             </wvobject>
             <wvobject fp_name="/testbench/soc/cpu/datapath/regfile0/rd1" type="array">
                <obj_property name="ElementShortName">rd1[31:0]</obj_property>
@@ -382,14 +376,6 @@
             <obj_property name="label">ALU</obj_property>
             <obj_property name="DisplayName">label</obj_property>
             <obj_property name="isExpanded"></obj_property>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/src_aE" type="array">
-               <obj_property name="ElementShortName">src_aE[31:0]</obj_property>
-               <obj_property name="ObjectShortName">src_aE[31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/src_bE" type="array">
-               <obj_property name="ElementShortName">src_bE[31:0]</obj_property>
-               <obj_property name="ObjectShortName">src_bE[31:0]</obj_property>
-            </wvobject>
             <wvobject fp_name="/testbench/soc/cpu/datapath/alu_outE" type="array">
                <obj_property name="ElementShortName">alu_outE[31:0]</obj_property>
                <obj_property name="ObjectShortName">alu_outE[31:0]</obj_property>
@@ -398,11 +384,20 @@
                <obj_property name="ElementShortName">alu_outM[31:0]</obj_property>
                <obj_property name="ObjectShortName">alu_outM[31:0]</obj_property>
             </wvobject>
+            <wvobject fp_name="/testbench/soc/cpu/datapath/src_aE" type="array">
+               <obj_property name="ElementShortName">src_aE[31:0]</obj_property>
+               <obj_property name="ObjectShortName">src_aE[31:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/testbench/soc/cpu/datapath/src_bE" type="array">
+               <obj_property name="ElementShortName">src_bE[31:0]</obj_property>
+               <obj_property name="ObjectShortName">src_bE[31:0]</obj_property>
+            </wvobject>
          </wvobject>
       </wvobject>
       <wvobject fp_name="group87" type="group">
          <obj_property name="label">MEM</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="group33" type="group">
             <obj_property name="label">MEM</obj_property>
             <obj_property name="DisplayName">label</obj_property>
@@ -431,9 +426,30 @@
                <obj_property name="ObjectShortName">mem_write_enM</obj_property>
             </wvobject>
          </wvobject>
+         <wvobject fp_name="group163" type="group">
+            <obj_property name="label">MUX2_mem_to_reg</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject fp_name="/testbench/soc/cpu/datapath/mux2_mem_to_reg/x0" type="array">
+               <obj_property name="ElementShortName">x0[31:0]</obj_property>
+               <obj_property name="ObjectShortName">x0[31:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/testbench/soc/cpu/datapath/mux2_mem_to_reg/x1" type="array">
+               <obj_property name="ElementShortName">x1[31:0]</obj_property>
+               <obj_property name="ObjectShortName">x1[31:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/testbench/soc/cpu/datapath/mux2_mem_to_reg/sel" type="logic">
+               <obj_property name="ElementShortName">sel</obj_property>
+               <obj_property name="ObjectShortName">sel</obj_property>
+            </wvobject>
+            <wvobject fp_name="/testbench/soc/cpu/datapath/mux2_mem_to_reg/y" type="array">
+               <obj_property name="ElementShortName">y[31:0]</obj_property>
+               <obj_property name="ObjectShortName">y[31:0]</obj_property>
+            </wvobject>
+         </wvobject>
          <wvobject fp_name="group205" type="group">
             <obj_property name="label">DATA</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/testbench/soc/cpu/data_en" type="logic">
                <obj_property name="ElementShortName">data_en</obj_property>
                <obj_property name="ObjectShortName">data_en</obj_property>
@@ -461,6 +477,7 @@
             <wvobject fp_name="group382" type="group">
                <obj_property name="label">D_OK</obj_property>
                <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="isExpanded"></obj_property>
                <wvobject fp_name="/testbench/soc/cpu_data_ok" type="logic">
                   <obj_property name="ElementShortName">cpu_data_ok</obj_property>
                   <obj_property name="ObjectShortName">cpu_data_ok</obj_property>
@@ -473,39 +490,6 @@
                   <obj_property name="ElementShortName">write</obj_property>
                   <obj_property name="ObjectShortName">write</obj_property>
                </wvobject>
-            </wvobject>
-         </wvobject>
-         <wvobject fp_name="group331" type="group">
-            <obj_property name="label">M_TO_REG</obj_property>
-            <obj_property name="DisplayName">label</obj_property>
-            <obj_property name="isExpanded"></obj_property>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/alu_outM" type="array">
-               <obj_property name="ElementShortName">alu_outM[31:0]</obj_property>
-               <obj_property name="ObjectShortName">alu_outM[31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/mem_rdataM" type="array">
-               <obj_property name="ElementShortName">mem_rdataM[31:0]</obj_property>
-               <obj_property name="ObjectShortName">mem_rdataM[31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/resultM" type="array">
-               <obj_property name="ElementShortName">resultM[31:0]</obj_property>
-               <obj_property name="ObjectShortName">resultM[31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/mem_to_regM" type="logic">
-               <obj_property name="ElementShortName">mem_to_regM</obj_property>
-               <obj_property name="ObjectShortName">mem_to_regM</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/reg_write_enM" type="logic">
-               <obj_property name="ElementShortName">reg_write_enM</obj_property>
-               <obj_property name="ObjectShortName">reg_write_enM</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/reg_writeE" type="array">
-               <obj_property name="ElementShortName">reg_writeE[4:0]</obj_property>
-               <obj_property name="ObjectShortName">reg_writeE[4:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/testbench/soc/cpu/datapath/reg_writeM" type="array">
-               <obj_property name="ElementShortName">reg_writeM[4:0]</obj_property>
-               <obj_property name="ObjectShortName">reg_writeM[4:0]</obj_property>
             </wvobject>
          </wvobject>
       </wvobject>
@@ -576,6 +560,7 @@
       <wvobject fp_name="group113" type="group">
          <obj_property name="label">HAZARD</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/testbench/soc/cpu/datapath/hazard0/rst" type="logic">
             <obj_property name="ElementShortName">rst</obj_property>
             <obj_property name="ObjectShortName">rst</obj_property>

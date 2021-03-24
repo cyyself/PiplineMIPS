@@ -3,7 +3,6 @@ module hazard (
     input wire [31:0] instrE,//no use
     input wire [31:0] instrM,//no use
     input wire d_cache_stall,
-    input wire div_stall,
 
     input wire [4:0] rsE,
     input wire [4:0] rtE,
@@ -23,8 +22,8 @@ module hazard (
 
     wire [1:0] forward_aE, forward_bE; //00-> NONE, 01-> MEM, 10-> WB (LW instr)
 
-    assign forward_aE = rsE != 0 && reg_write_enM && (rsE == reg_writeM) ? 2'b01 :
-                        rsE != 0 && reg_write_enW && (rsE == reg_writeW) ? 2'b10 :
+    assign forward_aE = reg_write_enM && (rsE == reg_writeM) ? 2'b01 :
+                        reg_write_enW && (rsE == reg_writeW) ? 2'b10 :
                         2'b00;
     assign forward_bE = reg_write_enM && (rtE == reg_writeM) ? 2'b01 :
                         reg_write_enW && (rtE == reg_writeW) ? 2'b10 :
@@ -39,9 +38,9 @@ module hazard (
     //                 );
     // end
     
-    assign stallF = d_cache_stall | div_stall;
-    assign stallD = d_cache_stall | div_stall;
-    assign stallE = d_cache_stall | div_stall;
-    assign stallM = d_cache_stall | div_stall;
-    assign stallW = d_cache_stall;              // 不暂停,会减少jr等指令冲突;
+    assign stallF = d_cache_stall;
+    assign stallD = d_cache_stall;
+    assign stallE = d_cache_stall;
+    assign stallM = d_cache_stall;
+    assign stallW = d_cache_stall;
 endmodule

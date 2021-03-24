@@ -2,7 +2,7 @@
 
 module tlb (
     input wire clk, rst,
-    input wire stallM, flushM,
+    input wire stallM, flushM, stallF,
     input wire [31:0] inst_vaddr,
     input wire [31:0] data_vaddr,
     input wire inst_en,
@@ -55,19 +55,20 @@ reg [31:0] TLB_EntryLo0 [`TLB_LINE_NUM-1:0];
 reg [31:0] TLB_EntryLo1 [`TLB_LINE_NUM-1:0];
 
 //--------------------------查找逻辑-----------------------------
-wire [31:0] vaddr1, vaddr2;
+wire [31:0] vaddr1, vaddr2, vaddr3;
 
 assign vaddr1 = inst_vaddr;
-    //端口2查找地址来源有load/store类指令的地址，和TLBP时的EntryHi
-assign vaddr2 = TLBP ? EntryHi_in : data_vaddr;
+assign vaddr2 = data_vaddr;
+assign vaddr3 = EntryHi_in;
 
-wire  [`TLB_LINE_NUM-1: 0]     find_mask1, find_mask2       ;
-wire  [`LOG2_TLB_LINE_NUM-1:0] find_index1, find_index2     ;
-reg   [`LOG2_TLB_LINE_NUM-1:0] find_index1_r, find_index2_r ;
-wire find1, find2;
+wire  [`TLB_LINE_NUM-1: 0]     find_mask1, find_mask2, find_mask3;
+wire  [`LOG2_TLB_LINE_NUM-1:0] find_index1, find_index2, find_index3;
+reg   [`LOG2_TLB_LINE_NUM-1:0] find_index1_r;
+wire find1, find2, find3;
 reg find1_r, find2_r;
 assign find1 = |find_mask1;
 assign find2 = |find_mask2;
+assign find3 = |find_mask3;
 
 genvar i;
 generate
@@ -75,6 +76,7 @@ generate
 	begin : find
 		assign find_mask1[i] = ((vaddr1[`VPN2_BITS] & ~TLB_PageMask[i][`VPN2_BITS]) == (TLB_EntryHi[i][`VPN2_BITS] & ~TLB_PageMask[i][`VPN2_BITS])) && (TLB_EntryHi[i][`G_BIT] || TLB_EntryHi[i][`ASID_BITS] == EntryHi_in[`ASID_BITS]); 
 		assign find_mask2[i] = ((vaddr2[`VPN2_BITS] & ~TLB_PageMask[i][`VPN2_BITS]) == (TLB_EntryHi[i][`VPN2_BITS] & ~TLB_PageMask[i][`VPN2_BITS])) && (TLB_EntryHi[i][`G_BIT] || TLB_EntryHi[i][`ASID_BITS] == EntryHi_in[`ASID_BITS]);		
+		assign find_mask3[i] = ((vaddr3[`VPN2_BITS] & ~TLB_PageMask[i][`VPN2_BITS]) == (TLB_EntryHi[i][`VPN2_BITS] & ~TLB_PageMask[i][`VPN2_BITS])) && (TLB_EntryHi[i][`G_BIT] || TLB_EntryHi[i][`ASID_BITS] == EntryHi_in[`ASID_BITS]);		
 	end
 endgenerate
 
@@ -87,31 +89,31 @@ assign find_index2=
 ({5{find_mask2[4 ]}} & 5'd4 ) |
 ({5{find_mask2[5 ]}} & 5'd5 ) |
 ({5{find_mask2[6 ]}} & 5'd6 ) |
-({5{find_mask2[7 ]}} & 5'd7 ) |
-({5{find_mask2[8 ]}} & 5'd8 ) |
-({5{find_mask2[9 ]}} & 5'd9 ) |
-({5{find_mask2[10]}} & 5'd10) |
-({5{find_mask2[11]}} & 5'd11) |
-({5{find_mask2[12]}} & 5'd12) |
-({5{find_mask2[13]}} & 5'd13) |
-({5{find_mask2[14]}} & 5'd14) |
-({5{find_mask2[15]}} & 5'd15) |
-({5{find_mask2[16]}} & 5'd16) |
-({5{find_mask2[17]}} & 5'd17) |
-({5{find_mask2[18]}} & 5'd18) |
-({5{find_mask2[19]}} & 5'd19) |
-({5{find_mask2[20]}} & 5'd20) |
-({5{find_mask2[21]}} & 5'd21) |
-({5{find_mask2[22]}} & 5'd22) |
-({5{find_mask2[23]}} & 5'd23) |
-({5{find_mask2[24]}} & 5'd24) |
-({5{find_mask2[25]}} & 5'd25) |
-({5{find_mask2[26]}} & 5'd26) |
-({5{find_mask2[27]}} & 5'd27) |
-({5{find_mask2[28]}} & 5'd28) |
-({5{find_mask2[29]}} & 5'd29) |
-({5{find_mask2[30]}} & 5'd30) |
-({5{find_mask2[31]}} & 5'd31);
+({5{find_mask2[7 ]}} & 5'd7 ) ;
+// ({5{find_mask2[8 ]}} & 5'd8 ) |
+// ({5{find_mask2[9 ]}} & 5'd9 ) |
+// ({5{find_mask2[10]}} & 5'd10) |
+// ({5{find_mask2[11]}} & 5'd11) |
+// ({5{find_mask2[12]}} & 5'd12) |
+// ({5{find_mask2[13]}} & 5'd13) |
+// ({5{find_mask2[14]}} & 5'd14) |
+// ({5{find_mask2[15]}} & 5'd15) |
+// ({5{find_mask2[16]}} & 5'd16) |
+// ({5{find_mask2[17]}} & 5'd17) |
+// ({5{find_mask2[18]}} & 5'd18) |
+// ({5{find_mask2[19]}} & 5'd19) |
+// ({5{find_mask2[20]}} & 5'd20) |
+// ({5{find_mask2[21]}} & 5'd21) |
+// ({5{find_mask2[22]}} & 5'd22) |
+// ({5{find_mask2[23]}} & 5'd23) |
+// ({5{find_mask2[24]}} & 5'd24) |
+// ({5{find_mask2[25]}} & 5'd25) |
+// ({5{find_mask2[26]}} & 5'd26) |
+// ({5{find_mask2[27]}} & 5'd27) |
+// ({5{find_mask2[28]}} & 5'd28) |
+// ({5{find_mask2[29]}} & 5'd29) |
+// ({5{find_mask2[30]}} & 5'd30) |
+// ({5{find_mask2[31]}} & 5'd31);
 
 assign find_index1=
 ({5{find_mask1[0 ]}} & 5'd0 ) |
@@ -121,101 +123,109 @@ assign find_index1=
 ({5{find_mask1[4 ]}} & 5'd4 ) |
 ({5{find_mask1[5 ]}} & 5'd5 ) |
 ({5{find_mask1[6 ]}} & 5'd6 ) |
-({5{find_mask1[7 ]}} & 5'd7 ) |
-({5{find_mask1[8 ]}} & 5'd8 ) |
-({5{find_mask1[9 ]}} & 5'd9 ) |
-({5{find_mask1[10]}} & 5'd10) |
-({5{find_mask1[11]}} & 5'd11) |
-({5{find_mask1[12]}} & 5'd12) |
-({5{find_mask1[13]}} & 5'd13) |
-({5{find_mask1[14]}} & 5'd14) |
-({5{find_mask1[15]}} & 5'd15) |
-({5{find_mask1[16]}} & 5'd16) |
-({5{find_mask1[17]}} & 5'd17) |
-({5{find_mask1[18]}} & 5'd18) |
-({5{find_mask1[19]}} & 5'd19) |
-({5{find_mask1[20]}} & 5'd20) |
-({5{find_mask1[21]}} & 5'd21) |
-({5{find_mask1[22]}} & 5'd22) |
-({5{find_mask1[23]}} & 5'd23) |
-({5{find_mask1[24]}} & 5'd24) |
-({5{find_mask1[25]}} & 5'd25) |
-({5{find_mask1[26]}} & 5'd26) |
-({5{find_mask1[27]}} & 5'd27) |
-({5{find_mask1[28]}} & 5'd28) |
-({5{find_mask1[29]}} & 5'd29) |
-({5{find_mask1[30]}} & 5'd30) |
-({5{find_mask1[31]}} & 5'd31);
+({5{find_mask1[7 ]}} & 5'd7 ) ;
+// ({5{find_mask1[8 ]}} & 5'd8 ) |
+// ({5{find_mask1[9 ]}} & 5'd9 ) |
+// ({5{find_mask1[10]}} & 5'd10) |
+// ({5{find_mask1[11]}} & 5'd11) |
+// ({5{find_mask1[12]}} & 5'd12) |
+// ({5{find_mask1[13]}} & 5'd13) |
+// ({5{find_mask1[14]}} & 5'd14) |
+// ({5{find_mask1[15]}} & 5'd15) |
+// ({5{find_mask1[16]}} & 5'd16) |
+// ({5{find_mask1[17]}} & 5'd17) |
+// ({5{find_mask1[18]}} & 5'd18) |
+// ({5{find_mask1[19]}} & 5'd19) |
+// ({5{find_mask1[20]}} & 5'd20) |
+// ({5{find_mask1[21]}} & 5'd21) |
+// ({5{find_mask1[22]}} & 5'd22) |
+// ({5{find_mask1[23]}} & 5'd23) |
+// ({5{find_mask1[24]}} & 5'd24) |
+// ({5{find_mask1[25]}} & 5'd25) |
+// ({5{find_mask1[26]}} & 5'd26) |
+// ({5{find_mask1[27]}} & 5'd27) |
+// ({5{find_mask1[28]}} & 5'd28) |
+// ({5{find_mask1[29]}} & 5'd29) |
+// ({5{find_mask1[30]}} & 5'd30) |
+// ({5{find_mask1[31]}} & 5'd31);
+
+assign find_index3 = 
+({5{find_mask3[0 ]}} & 5'd0 ) |
+({5{find_mask3[1 ]}} & 5'd1 ) |
+({5{find_mask3[2 ]}} & 5'd2 ) |
+({5{find_mask3[3 ]}} & 5'd3 ) |
+({5{find_mask3[4 ]}} & 5'd4 ) |
+({5{find_mask3[5 ]}} & 5'd5 ) |
+({5{find_mask3[6 ]}} & 5'd6 ) |
+({5{find_mask3[7 ]}} & 5'd7 ) ;
+// ({5{find_mask3[8 ]}} & 5'd8 ) |
+// ({5{find_mask3[9 ]}} & 5'd9 ) |
+// ({5{find_mask3[10]}} & 5'd10) |
+// ({5{find_mask3[11]}} & 5'd11) |
+// ({5{find_mask3[12]}} & 5'd12) |
+// ({5{find_mask3[13]}} & 5'd13) |
+// ({5{find_mask3[14]}} & 5'd14) |
+// ({5{find_mask3[15]}} & 5'd15) |
+// ({5{find_mask3[16]}} & 5'd16) |
+// ({5{find_mask3[17]}} & 5'd17) |
+// ({5{find_mask3[18]}} & 5'd18) |
+// ({5{find_mask3[19]}} & 5'd19) |
+// ({5{find_mask3[20]}} & 5'd20) |
+// ({5{find_mask3[21]}} & 5'd21) |
+// ({5{find_mask3[22]}} & 5'd22) |
+// ({5{find_mask3[23]}} & 5'd23) |
+// ({5{find_mask3[24]}} & 5'd24) |
+// ({5{find_mask3[25]}} & 5'd25) |
+// ({5{find_mask3[26]}} & 5'd26) |
+// ({5{find_mask3[27]}} & 5'd27) |
+// ({5{find_mask3[28]}} & 5'd28) |
+// ({5{find_mask3[29]}} & 5'd29) |
+// ({5{find_mask3[30]}} & 5'd30) |
+// ({5{find_mask3[31]}} & 5'd31);
 //--------------------------查找逻辑-----------------------------
 
 //--------------------------读TLB逻辑-----------------------------
-wire [`LOG2_TLB_LINE_NUM-1: 0] index1, index2;
+wire [`LOG2_TLB_LINE_NUM-1: 0] index1, index2, index3;
 assign index1 = find_index1_r;
-// assign index2 = TLBR ? Index_in[`INDEX_BITS] : find_index2_r;
-// assign index1 = find_index1;
-assign index2 = TLBR ? Index_in[`INDEX_BITS] : find_index2;
+assign index2 = find_index2;
+assign index3 = TLBP ? find_index3 : Index_in[`INDEX_BITS];
 
 wire [31:0] EntryLo0_read1;
 wire [31:0] EntryLo1_read1;
 
-// wire [31:0] EntryHi_read2;
-// wire [31:0] PageMask_read2;
-// wire [31:0] EntryLo0_read2;
-// wire [31:0] EntryLo1_read2;
+wire [31:0] EntryLo0_read2;
+wire [31:0] EntryLo1_read2;
 
-// reg [31:0] EntryLo0_read1;
-// reg [31:0] EntryLo1_read1;
+wire [31:0] EntryHi_read3;
+wire [31:0] PageMask_read3;
+wire [31:0] EntryLo0_read3;
+wire [31:0] EntryLo1_read3;
 
-reg [31:0] EntryHi_read2;
-reg [31:0] PageMask_read2;
-reg [31:0] EntryLo0_read2;
-reg [31:0] EntryLo1_read2;
-
-// wire [31:0] EntryLo0_read1_r;
-// wire [31:0] EntryLo1_read1_r;
-
-wire [31:0] EntryHi_read2_r;
-wire [31:0] PageMask_read2_r;
-wire [31:0] EntryLo0_read2_r;
-wire [31:0] EntryLo1_read2_r;
+reg [31:0] EntryLo0_read2_r;
+reg [31:0] EntryLo1_read2_r;
 
 assign EntryLo0_read1 =TLB_EntryLo0[index1];
 assign EntryLo1_read1 =TLB_EntryLo1[index1];
 
-// assign EntryLo0_read1_r =TLB_EntryLo0[index1];
-// assign EntryLo1_read1_r =TLB_EntryLo1[index1];
+assign EntryLo0_read2 =TLB_EntryLo0[index2];
+assign EntryLo1_read2 =TLB_EntryLo1[index2];
 
-assign EntryHi_read2_r  =TLB_EntryHi[index2];
-assign PageMask_read2_r =TLB_PageMask[index2];
-assign EntryLo0_read2_r =TLB_EntryLo0[index2];
-assign EntryLo1_read2_r =TLB_EntryLo1[index2];
+assign EntryHi_read3  =TLB_EntryHi[index3];
+assign PageMask_read3 =TLB_PageMask[index3];
+assign EntryLo0_read3 =TLB_EntryLo0[index3];
+assign EntryLo1_read3 =TLB_EntryLo1[index3];
 
 always @(posedge clk) begin
     if(rst | flushM) begin
-        // EntryLo0_read1  <= 0;
-        // EntryLo1_read1  <= 0;
-        EntryHi_read2   <= 0;
-        PageMask_read2  <= 0;
-        EntryLo0_read2  <= 0;
-        EntryLo1_read2  <= 0;
+        EntryLo0_read2_r  <= 0;
+        EntryLo1_read2_r  <= 0;
     end
     else if(~stallM) begin
-        // EntryLo0_read1  <= EntryLo0_read1_r;
-        // EntryLo1_read1  <= EntryLo1_read1_r;
-        EntryHi_read2   <= EntryHi_read2_r ;
-        PageMask_read2  <= PageMask_read2_r;
-        EntryLo0_read2  <= EntryLo0_read2_r;
-        EntryLo1_read2  <= EntryLo1_read2_r;
+        EntryLo0_read2_r  <= EntryLo0_read2;
+        EntryLo1_read2_r  <= EntryLo1_read2;
     end 
 end
 
-// assign EntryLo0_read1 = TLB_EntryLo0[index1];
-// assign EntryLo1_read1 = TLB_EntryLo1[index1];
-
-// assign EntryHi_read2  = TLB_EntryHi[index2];
-// assign PageMask_read2 = TLB_PageMask[index2];
-// assign EntryLo0_read2 = TLB_EntryLo0[index2];
-// assign EntryLo1_read2 = TLB_EntryLo1[index2];
 //--------------------------读TLB逻辑-----------------------------
 
 //--------------------------写TLB逻辑-----------------------------
@@ -262,7 +272,9 @@ reg data_kseg01M;
 wire data_kseg1E;
 reg data_kseg1M;
 assign data_kseg01E = data_vaddr[31:30]==2'b10 ? 1'b1 : 1'b0;
-assign data_kseg1E = data_vaddr[31:29]==3'b101 ? 1'b1 : 1'b0;
+assign data_kseg1E = data_vaddr[31:29]==3'b101 
+                    || (data_vaddr[31] & ~(|data_vaddr[30:22]) & (|data_vaddr[21:20])) //8010_0000 - 803F_FFFF 为跑监控程序时用户代码空间。直接设置为非cache，从而不用实现i_cache和d_cache的一致性
+                    ? 1'b1 : 1'b0;
 
 wire [`TAG_WIDTH-1:0] data_vpnE;
 reg [`TAG_WIDTH-1:0] data_vpnM;
@@ -270,10 +282,10 @@ assign data_vpnE = data_vaddr[31:`OFFSET_WIDTH];
 
 //M阶段的data的物理页号
 assign data_pfn = data_kseg01M? {3'b0, data_vpnM[`TAG_WIDTH-4:0]} :
-                 ~data_oddM   ? EntryLo0_read2[`PFN_BITS] : EntryLo1_read2[`PFN_BITS];
+                 ~data_oddM   ? EntryLo0_read2_r[`PFN_BITS] : EntryLo1_read2_r[`PFN_BITS];
 
 wire [5:0] data_flag;
-assign data_flag = ~data_oddM ? EntryLo0_read2[`FLAG_BITS] : EntryLo1_read2[`FLAG_BITS];
+assign data_flag = ~data_oddM ? EntryLo0_read2_r[`FLAG_BITS] : EntryLo1_read2_r[`FLAG_BITS];
 
 assign no_cache_d = data_kseg01M ? (data_kseg1M ? 1'b1 : 1'b0) :
                     data_flag[`C_BITS]==3'b010 ? 1'b1 : 1'b0;
@@ -303,13 +315,13 @@ assign no_cache_i = inst_kseg01M ? (inst_kseg1M ? 1'b1 : 1'b0) :
 
 /*TLB指令*/
     //TLBR
-assign EntryHi_out  = EntryHi_read2;
-assign PageMask_out = PageMask_read2;
-assign EntryLo0_out = {EntryLo0_read2[31:1], EntryHi_read2[`G_BIT]};
-assign EntryLo1_out = {EntryLo1_read2[31:1], EntryHi_read2[`G_BIT]};
+assign EntryHi_out  = EntryHi_read3;
+assign PageMask_out = PageMask_read3;
+assign EntryLo0_out = {EntryLo0_read3[31:1], EntryHi_read3[`G_BIT]};
+assign EntryLo1_out = {EntryLo1_read3[31:1], EntryHi_read3[`G_BIT]};
 
     //TLBP
-assign Index_out    = find2 ? find_index2 : 32'h8000_0000;
+assign Index_out    = find3 ? find_index3 : 32'h8000_0000;
 
 //异常
     //取指TLB异常
@@ -330,31 +342,36 @@ assign data_tlb_modify  = data_kseg01M ? 1'b0 : mem_write_enM & find2_r & data_V
 //--------------------------pipeline---------------------------------
 always @(posedge clk) begin
     if(rst | flushM) begin
-        find1_r         <= 0;
         find2_r         <= 0;
-        find_index1_r   <= 0;
-        find_index2_r   <= 0;
 
         data_oddM       <= 0;
         data_kseg01M    <= 0;
         data_kseg1M     <= 0;
         data_vpnM       <= 0;
+    end
+    else if(~stallM) begin
+        find2_r         <= find2        ;
+
+        data_oddM       <= data_oddE    ;
+        data_kseg01M    <= data_kseg01E ;
+        data_kseg1M     <= data_kseg1E  ;
+        data_vpnM       <= data_vpnE    ;
+    end
+end
+
+always@(posedge clk) begin
+    if(rst) begin
+        find1_r         <= 0;
+        find_index1_r   <= 0;
 
         inst_oddM       <= 0;
         inst_kseg01M    <= 0;
         inst_kseg1M     <= 0;
         inst_vpnM       <= 0;
     end
-    else if(~stallM) begin
+    else if(~stallF) begin
         find1_r         <= find1        ;
-        find2_r         <= find2        ;
         find_index1_r   <= find_index1  ;
-        find_index2_r   <= find_index2  ;
-
-        data_oddM       <= data_oddE    ;
-        data_kseg01M    <= data_kseg01E ;
-        data_kseg1M     <= data_kseg1E  ;
-        data_vpnM       <= data_vpnE    ;
 
         inst_oddM       <= inst_oddE    ;
         inst_kseg01M    <= inst_kseg01E ;

@@ -23,19 +23,19 @@
 `define EXE_MFLO  		6'b010010
 `define EXE_MTLO  		6'b010011
 //算术运算
-`define EXE_SLT     6'b101010
-`define EXE_SLTU    6'b101011
-`define EXE_SLTI    6'b001010
-`define EXE_SLTIU   6'b001011   
-`define EXE_ADD     6'b100000
-`define EXE_ADDU    6'b100001
-`define EXE_SUB     6'b100010
-`define EXE_SUBU    6'b100011
-`define EXE_ADDI    6'b001000
-`define EXE_ADDIU   6'b001001
+`define EXE_SLT  6'b101010
+`define EXE_SLTU  6'b101011
+`define EXE_SLTI  6'b001010
+`define EXE_SLTIU  6'b001011   
+`define EXE_ADD  6'b100000
+`define EXE_ADDU  6'b100001
+`define EXE_SUB  6'b100010
+`define EXE_SUBU  6'b100011
+`define EXE_ADDI  6'b001000
+`define EXE_ADDIU  6'b001001
 
-`define EXE_MULT    6'b011000
-`define EXE_MULTU   6'b011001
+`define EXE_MULT  6'b011000
+`define EXE_MULTU  6'b011001
 
 `define EXE_DIV  6'b011010
 `define EXE_DIVU  6'b011011
@@ -86,9 +86,7 @@
 `define EXE_TNE 6'b110110
 `define EXE_TNEI 5'b01110
    
-// `define EXE_ERET 32'b01000010000000000000000000011000
-`define EXE_ERET 26'b10000000000000000000011000
-`define EXE_ERET_MFTC 6'b010000
+`define EXE_ERET 32'b01000010000000000000000000011000
 
 `define EXE_SYNC 6'b001111
 `define EXE_PREF 6'b110011
@@ -125,10 +123,3 @@
 `define CP0_REG_EPC    5'b01110         
 `define CP0_REG_PRID    5'b01111        
 `define CP0_REG_CONFIG    5'b10000      
-
-`define InterruptAssert 1'b1
-`define InterruptNotAssert 1'b0
-`define InDelaySlot 	1'b1
-`define NotInDelaySlot 	1'b0
-
-`define ZeroWord        32'd0
